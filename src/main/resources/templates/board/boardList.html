@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="board/layout/basic">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+</script>
+<header th:replace="~{common/hearder :: HeaderFragment}"></header>
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <nav>
+        </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form id="searchForm" method="get" action="/board/bList.do">
+                            <div style="text-align: right; margin-top: 10px;">
+                                <input type="text" style="width: 30%; display: initial;" class="form-control" id="searchWord" name="searchWord" placeholder="검색">
+                                <button type="button" id="searchBtn" class="btn btn-dark">검색</button>
+                            </div>
+                        </form>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th style="width: 45%">제목</th>
+                                <th style="width: 15%">작성자</th>
+                                <th style="width: 20%">등록일</th>
+                                <th style="width: 20%">최종수정일</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${not #lists.isEmpty( boardList )}" th:each="row : ${boardList}">
+                                <td class="text-left">
+                                    <a th:href="@{/board/bDeatail.do( boardId=${row.board_id} )}"
+                                       th:if="${row.board_title.length() > 20}"
+                                       th:text="${#strings.substring(row.board_title,0,21)+'...'}"></a>
+                                    <a th:href="@{/board/bDeatail.do( boardId=${row.board_id} )}"
+                                       th:unless="${row.board_title.length() > 20}"
+                                       th:text="${row.board_title}"></a>
+                                </td>
+                                <td th:text="${row.writer}"></td>
+                                <td th:block th:text="${#strings.substring(row.board_created_at, 0, 19)}" /></td>
+                                <td th:block th:text="${#strings.substring(row.board_update_at, 0, 19)}" /></td>
+                            </tr>
+                            <tr th:unless="${not #lists.isEmpty( boardList )}">
+                                <td colspan="4" style="text-align: center;">조회된 결과가 없습니다.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <!-- End Table with stripped rows -->
+                    </div>
+                    <div>
+                        <a href="#" th:href="@{/board/write.do}">
+                        <button style="float: right; margin: 10px;" type="button" id="writeBtn" class="btn btn-primary">
+                            글쓰기</button>
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <script>
+        $(function(){
+            $('#searchBtn').on("click",function(){
+                if (!checkSearch()) {
+                    return;
+                }
+                $('#searchForm').submit();
+            });
+
+            function checkSearch() {
+                if ($("#searchWord").val() == null || $("#searchWord").val() == '') {
+                    alert("검색 단어를 작성해주세요.");
+                    return false;
+                }
+                if ($("#searchWord").val().length < 2) {
+                    alert("검색 단어를 2글자 이상 작성해주세요.");
+                    return false;
+                }
+                return true;
+            };
+        });//ready
+    </script>
+</main><!-- End #main -->
+<footer th:replace="~{common/footer :: FooterFragment}"></footer>
+</body>
+</html>

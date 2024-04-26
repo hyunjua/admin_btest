@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="board/layout/basic">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<header th:replace="~{common/hearder :: HeaderFragment}"></header>
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <nav>
+        </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <form id="boardForm" th:action="@{/board/updateBoard.do}"  th:object="${BoardVo}" method="post" >
+                        <div id ="formDiv" class="card-body">
+                                <div class="form-group">
+                                    <label for="title">제목</label>
+                                    <input th:value="${board.board_title}" type="text" class="form-control" id="title" name="title" readonly>
+                                    <input th:value="${board.board_id}" type="hidden" class="form-control" id="boardId" name="boardId" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label for="writer">작성자</label>
+                                    <input th:value="${board.writer}" type="text" class="form-control" id="writer" name="writer" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label for="content">내용</label>
+                                    <textarea th:value="${board.board_content}" th:text="${board.board_content}" style="height: 400px;" class="form-control" id="content" name="content" readonly></textarea>
+                                </div>
+                                <br>
+                                <div id="buttonDiv">
+                                    <button style="float: right; margin-left:10px; display: none;" type="button" id="cancelBtn" class="btn btn-danger">취소</button>
+                                    <button style="float: right; margin-left:10px;" type="button" id="deleteBtn" class="btn btn-danger">삭제</button>
+                                    <button style="float: right;" type="button" id="updateBtn" class="btn btn-primary">수정</button>
+                                    <button style="float: right; display: none;" type="button" id="saveBtn" class="btn btn-primary">저장</button>
+                                </div>
+                                <br>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <script type="text/javascript">
+        $(function(){
+
+            btnClick();
+            let oriTitle = '[[${board.board_title}]]';
+            let oriContent = '[[${board.board_content}]]';
+
+            function btnClick() {
+                $("#updateBtn").click(function(){
+                    $("#updateBtn").hide();
+                    $("#deleteBtn").hide();
+                    $("#cancelBtn").show();
+                    $("#saveBtn").show();
+
+                    $("#title").removeAttr("readonly");
+                    $("#content").removeAttr("readonly");
+                });//click
+
+                // 수정취소
+                $("#cancelBtn").click(function(){
+                    $("#title").val(oriTitle);
+                    $("#content").val(oriContent);
+                    updateResetBtn();
+                });
+
+                // 수정저장
+                $("#saveBtn").click(function(){
+                    let check = checkForm();
+                    if(check) {
+                        updateAjax();
+                    }
+                });
+
+                // 삭제하기
+                $("#deleteBtn").click(function(){
+                    $("#boardForm").attr("action", "/board/deleteBoard.do");
+                    $("#boardForm").submit();
+                });//click
+            }
+
+
+            function checkForm() {
+                if($("#title").val() == null || $("#title").val() == '') {
+                    alert("제목 작성 필수입니다.");
+                    return false;
+                }
+                if($("#title").val().length > 50) {
+                    alert("제목 최대 작성 길이 50입니다.");
+                    return false;
+                }
+                if($("#content").val() == null || $("#content").val() == '') {
+                    alert("내용 작성 필수입니다.");
+                    return false;
+                }
+                if($("#content").val().length > 200) {
+                    alert("내용 최대 작성 길이 200입니다.");
+                    return false;
+                }
+                return true;
+            };
+
+            function updateAjax() {
+                let formData = $("#boardForm").serialize(); // form 데이터 직렬화
+                $.ajax({
+                    url: "/board/updateBoard.do",
+                    type: "POST",
+                    data: formData, // 직렬화된 폼 데이터/]
+
+                    success: function(response){
+                        alert("수정완료");
+                        $("#formDiv").replaceWith(response);
+                        updateResetBtn();
+                        btnClick();
+                    },
+                    error: function(error){
+                        alert("error : " + error);
+                    }
+                });
+            };
+
+            function updateResetBtn() {
+                $("#updateBtn").show();
+                $("#deleteBtn").show();
+                $("#cancelBtn").hide();
+                $("#saveBtn").hide();
+
+                $("#title").prop("readonly", true);
+                $("#content").prop("readonly", true);
+            }
+        });//ready
+    </script>
+</main><!-- End #main -->
+<footer th:replace="~{common/footer :: FooterFragment}"></footer>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ai.cubox.admin_ftest.admin.mapper.BoardMapper">
+
+    <sql id="boardColumns">
+        board_id
+        , board_title
+		, board_content
+		, board_created_at
+		, board_update_at
+		, writer
+		, deleteYn
+    </sql>
+
+    <select id="getBoardList" resultType="HashMap">
+        SELECT
+            <include refid="boardColumns" />
+        FROM
+            board
+        WHERE
+            deleteYn = 'N'
+        <if test='keyword !=null and keyword != ""'>
+        AND
+            board_title like concat('%', #{keyword}, '%')
+        </if>
+        ORDER BY
+            board_id DESC
+    </select>
+
+    <insert id="insertBoard" parameterType="HashMap">
+        INSERT INTO board (
+            board_title
+          , board_content
+          , board_created_at
+          , board_update_at
+          , writer
+        ) VALUES (
+            #{title}
+            , #{content}
+            , NOW()
+            , NOW()
+            , #{writer}
+        )
+    </insert>
+
+    <select id="selectBoardDetail" parameterType="HashMap" resultType="HashMap">
+        SELECT
+            <include refid="boardColumns" />
+        FROM
+            board
+        WHERE
+            deleteYn = 'N'
+        AND
+            board_id = #{boardId}
+    </select>
+
+    <update id="updateBoard" parameterType="HashMap">
+        UPDATE board
+        SET
+            board_update_at = NOW()
+          , board_title = #{title}
+          , board_content = #{content}
+        WHERE
+            board_id = #{boardId}
+    </update>
+
+    <update id="deleteBoard" parameterType="long">
+        UPDATE board
+        SET
+            deleteYn = 'Y'
+          , board_update_at = NOW()
+        WHERE
+            board_id = #{boardId}
+    </update>
+
+</mapper>
