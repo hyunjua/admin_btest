@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ai.cubox.admin_ftest.admin.mapper.CommonMapper">
+
+    <select id="selectUser" parameterType="loginVO" resultType="loginVO">
+        select esntl_id as esntlId
+             , user_id as userId
+             , user_nm as userNm
+             , user_pw as userPw
+             , date_format(pw_updt_dt, '%Y-%m-%d') as pwUpdtDe
+             , ifnull(datediff(now(3), pw_updt_dt), 999) pwUpdtDays
+        from user
+        where user_id = #{userId}
+          /*and user_pw = #{userPw}*/
+    </select>
+
+    <update id="updatePwd" parameterType="HashMap">
+        UPDATE user
+        SET
+            pw_updt_dt = DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')
+          , user_pw = #{newPasswd}
+        WHERE
+            user_id = #{userId}
+    </update>
+
+
+</mapper>

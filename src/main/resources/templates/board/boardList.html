@@ -47,8 +47,8 @@
                                        th:text="${row.board_title}"></a>
                                 </td>
                                 <td th:text="${row.writer}"></td>
-                                <td th:block th:text="${#strings.substring(row.board_created_at, 0, 19)}" /></td>
-                                <td th:block th:text="${#strings.substring(row.board_update_at, 0, 19)}" /></td>
+                                <td th:text="${#strings.substring(row.board_created_at, 0, 19)}" /></td>
+                                <td th:text="${#strings.substring(row.board_update_at, 0, 19)}" /></td>
                             </tr>
                             <tr th:unless="${not #lists.isEmpty( boardList )}">
                                 <td colspan="4" style="text-align: center;">조회된 결과가 없습니다.</td>
